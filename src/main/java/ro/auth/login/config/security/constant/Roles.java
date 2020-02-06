@@ -2,9 +2,9 @@ package ro.auth.login.config.security.constant;
 
 public final class Roles {
 
-    public static final String DETONATOR_ROLE = "DETONATOR";
+    public static final String ADMIN_ROLE = "ADMIN";
 
-    public static final String DETONATOR = "hasAuthority('" + DETONATOR_ROLE + "')";
+    public static final String ADMIN = "hasAuthority('" + ADMIN_ROLE + "')";
 
     public static final String USER_ROLE = "USER";
 
