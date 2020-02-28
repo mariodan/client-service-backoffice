@@ -1,4 +1,4 @@
-package ro.auth.login.config.security.dto;
+package ro.enel.backoffice.dto;
 
 public class AuthRequest {
     public String username;

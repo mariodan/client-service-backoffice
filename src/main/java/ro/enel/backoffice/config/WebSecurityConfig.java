@@ -1,8 +1,8 @@
-package ro.auth.login.config;
+package ro.enel.backoffice.config;
 
 import org.springframework.security.config.http.SessionCreationPolicy;
-import ro.auth.login.config.security.RestAuthenticationEntryPoint;
-import ro.auth.login.config.security.filter.RequestBodyReaderAuthenticationFilter;
+import ro.enel.backoffice.config.security.RestAuthenticationEntryPoint;
+import ro.enel.backoffice.filter.RequestBodyReaderAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 

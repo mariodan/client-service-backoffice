@@ -1,4 +1,4 @@
-package ro.auth.login.config.security.constant;
+package ro.enel.backoffice.config.security.constant;
 
 public final class Roles {
 

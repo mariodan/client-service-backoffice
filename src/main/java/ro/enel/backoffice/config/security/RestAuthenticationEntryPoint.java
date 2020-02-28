@@ -1,4 +1,4 @@
-package ro.auth.login.config.security;
+package ro.enel.backoffice.config.security;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

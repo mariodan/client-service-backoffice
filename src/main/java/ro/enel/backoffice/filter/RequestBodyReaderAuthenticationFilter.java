@@ -1,7 +1,7 @@
-package ro.auth.login.config.security.filter;
+package ro.enel.backoffice.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ro.auth.login.config.security.dto.AuthRequest;
+import ro.enel.backoffice.dto.AuthRequest;
 import org.apache.commons.io.IOUtils;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

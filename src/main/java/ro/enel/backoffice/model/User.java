@@ -1,4 +1,4 @@
-package ro.auth.login.domain;
+package ro.enel.backoffice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
