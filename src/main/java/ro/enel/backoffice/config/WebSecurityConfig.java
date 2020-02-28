@@ -1,6 +1,7 @@
 package ro.enel.backoffice.config;
 
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.web.client.RestTemplate;
 import ro.enel.backoffice.config.security.RestAuthenticationEntryPoint;
 import ro.enel.backoffice.filter.RequestBodyReaderAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
 
