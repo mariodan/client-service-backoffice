@@ -1,10 +1,8 @@
 package ro.auth.login.config.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ro.auth.login.config.security.dto.LoginRequest;
+import ro.auth.login.config.security.dto.AuthRequest;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,10 +15,7 @@ import java.io.IOException;
 
 public class RequestBodyReaderAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private static final Log LOG = LogFactory.getLog(RequestBodyReaderAuthenticationFilter.class);
-
     private static final String ERROR_MESSAGE = "Something went wrong while parsing /login request body";
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public RequestBodyReaderAuthenticationFilter() {
@@ -31,12 +26,11 @@ public class RequestBodyReaderAuthenticationFilter extends UsernamePasswordAuthe
         String requestBody;
         try {
             requestBody = IOUtils.toString(request.getReader());
-            LoginRequest authRequest = objectMapper.readValue(requestBody, LoginRequest.class);
+            AuthRequest authRequest = objectMapper.readValue(requestBody, AuthRequest.class);
 
             UsernamePasswordAuthenticationToken token
                 = new UsernamePasswordAuthenticationToken(authRequest.username, authRequest.password);
 
-            // Allow subclasses to set the "details" property
             setDetails(request, token);
 
             return this.getAuthenticationManager().authenticate(token);

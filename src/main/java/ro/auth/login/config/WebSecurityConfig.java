@@ -1,19 +1,17 @@
-package ro.auth.login.config.security;
+package ro.auth.login.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import ro.auth.login.config.security.RestAuthenticationEntryPoint;
 import ro.auth.login.config.security.filter.RequestBodyReaderAuthenticationFilter;
-import ro.auth.login.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -25,58 +23,64 @@ import java.io.IOException;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserService userService;
-    private final ObjectMapper objectMapper;
-    private final PasswordEncoder passwordEncoder;
-
-    public WebSecurityConfig(UserService userService, ObjectMapper objectMapper, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.objectMapper = objectMapper;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private static final String LOGIN_URI = "/v1/login";
+    private static final String LOGOUT_URI = "/v1/logout";
 
     @Bean
     public RequestBodyReaderAuthenticationFilter authenticationFilter() throws Exception {
-        RequestBodyReaderAuthenticationFilter authenticationFilter
-            = new RequestBodyReaderAuthenticationFilter();
+        RequestBodyReaderAuthenticationFilter authenticationFilter = new RequestBodyReaderAuthenticationFilter();
         authenticationFilter.setAuthenticationSuccessHandler(this::loginSuccessHandler);
         authenticationFilter.setAuthenticationFailureHandler(this::loginFailureHandler);
-        authenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST"));
+        authenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(LOGIN_URI, "POST"));
         authenticationFilter.setAuthenticationManager(authenticationManagerBean());
         return authenticationFilter;
     }
 
-    @Bean
-    public DaoAuthenticationProvider authProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService);
-        authProvider.setPasswordEncoder(passwordEncoder);
-        return authProvider;
-    }
-
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authProvider());
+        auth.inMemoryAuthentication().withUser("admin").password("{noop}admin}").roles("ADMIN");
     }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+                .withUser("admin")
+                .password("{noop}admin")
+                .roles("ADMIN")
+                .and()
+                .withUser("manager")
+                .password("{noop}manager")
+                .roles("MANAGER");
+    }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
             .authorizeRequests()
-            .anyRequest().authenticated()
-
+                .antMatchers("/actuator/**", "/management/**")
+                .permitAll()
+            .anyRequest()
+                .authenticated()
             .and()
+                .formLogin()
+                .loginPage(LOGIN_URI)
+                .failureHandler(this::loginFailureHandler)
+                .and()
             .addFilterBefore(
                 authenticationFilter(),
                 UsernamePasswordAuthenticationFilter.class)
-            .logout()
-            .logoutUrl("/logout")
-            .logoutSuccessHandler(this::logoutSuccessHandler)
-
-            .and()
             .exceptionHandling()
-            .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
+                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+            .and()
+                .logout()
+                .logoutUrl(LOGOUT_URI)
+            .deleteCookies("JSESSIONID")
+            .logoutSuccessHandler(this::logoutSuccessHandler)
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
     }
 
 
@@ -86,7 +90,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             Authentication authentication) throws IOException {
 
         response.setStatus(HttpStatus.OK.value());
-        objectMapper.writeValue(response.getWriter(), "Yayy you logged in!");
     }
 
     private void loginFailureHandler(
@@ -95,7 +98,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         AuthenticationException e) throws IOException {
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        objectMapper.writeValue(response.getWriter(), "Nopity nop!");
     }
 
     private void logoutSuccessHandler(
@@ -104,6 +106,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         Authentication authentication) throws IOException {
 
         response.setStatus(HttpStatus.OK.value());
-        objectMapper.writeValue(response.getWriter(), "Bye!");
     }
 }
