@@ -88,6 +88,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new RestTemplate();
     }
 
+    @Bean
+    public ServicesConfigProperties servicesConfig() {
+        return new ServicesConfigProperties();
+    }
+
 
     private void loginSuccessHandler(
             HttpServletRequest request,

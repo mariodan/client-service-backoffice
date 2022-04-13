@@ -10,3 +10,11 @@ management:
   health:
     ldap:
       enabled: false
+
+
+services:
+  auth-service:
+    url: http://localhost
+    urlPath: /v1/user/profile
+  user-profile:
+    url: https://openexchangerates.org/api/currencies.json

@@ -1,21 +1,21 @@
 package ro.enel.backoffice.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import ro.enel.backoffice.model.CustomerDetailsResponse;
+import ro.enel.backoffice.config.ServicesConfigProperties;
+
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerService {
 
-    @Autowired
-    RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final ServicesConfigProperties servicesConfigProperties;
 
-    public ResponseEntity<CustomerDetailsResponse> getCustomerDetailsByCif(String cif) {
-        //TODO implement restTemplate call
-        return new ResponseEntity<CustomerDetailsResponse>(new CustomerDetailsResponse(), HttpStatus.OK);
+    public Map<String, String> getCustomerDetailsByCif(final String cif) {
+        return  restTemplate.getForObject(servicesConfigProperties.getAuthServiceUrl(), Map.class);
     }
 
 }
